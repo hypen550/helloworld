@@ -12,15 +12,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Deploy to VPS existing folder
+    - name: Deploy to VPS by cloning repo
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         script: |
-          cd ~/helloworld
-          git pull origin main
+          if [ -d ~/helloworld ]; then
+            cd ~/helloworld
+            git pull origin main
+          else
+            git clone https://github.com/hypen550/helloworld.git ~/helloworld
+            cd ~/helloworld
+          fi
           docker build -t helloworld .
           docker stop helloworld || true
           docker rm helloworld || true
