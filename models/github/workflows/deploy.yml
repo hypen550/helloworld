@@ -2,7 +2,8 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -12,14 +13,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Deploy to VPS existing folder
+    - name: Deploy via SSH
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         script: |
-          cd ~/helloworld
+          cd helloworld
           git pull origin main
           docker build -t helloworld .
           docker stop helloworld || true
