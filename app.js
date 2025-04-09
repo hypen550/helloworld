@@ -10,14 +10,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('public/uploads'));
 app.set('view engine', 'ejs');
 
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI);
 
+// Multer config
 const storage = multer.diskStorage({
   destination: 'public/uploads/',
   filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage });
 
+// Routes
 app.get('/', async (req, res) => {
   const articles = await Article.find();
   res.render('index', { articles });
@@ -34,4 +37,8 @@ app.post('/admin', upload.single('image'), async (req, res) => {
   res.redirect('/');
 });
 
-app.listen(3000, () => console.log("Running on port 3000"));
+// ✅ Only ONE app.listen here:
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Running on port ${PORT}`);
+});
